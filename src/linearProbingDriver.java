@@ -1,9 +1,8 @@
-import com.opencsv.CSVWriter;
-
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Scanner;
 
 public class linearProbingDriver {
@@ -11,8 +10,8 @@ public class linearProbingDriver {
     public static void main(String[] args) throws IOException {
 
         ArrayList<String[]> store = new ArrayList<>();
-        ArrayList<String[]> success = new ArrayList<>();
-        ArrayList<String[]> unsuccess = new ArrayList<>();
+        ArrayList<Integer> success = new ArrayList<>();
+        ArrayList<Integer> unsuccess = new ArrayList<>();
 
         Scanner file = new Scanner(new File("Large Data Set.txt"));
 
@@ -23,13 +22,66 @@ public class linearProbingDriver {
         file = new Scanner(new File("Successful Search.txt"));
 
         while(file.hasNext()){
-            success.add(file.nextLine().split(" "));
+            success.add(Integer.parseInt(file.nextLine().split(" ")[0]));
         }
 
         file = new Scanner(new File("Unsuccessful Search.txt"));
 
         while(file.hasNext()){
-            unsuccess.add(file.nextLine().split(" "));
+            unsuccess.add(Integer.parseInt(file.nextLine().split(" ")[0]));
+        }
+
+        ArrayList<Double> collisions1 = new ArrayList<>();
+        ArrayList<Double> storeTime1 = new ArrayList<>();
+
+        ArrayList<Double> collisions2 = new ArrayList<>();
+        ArrayList<Double> storeTime2 = new ArrayList<>();
+
+        ArrayList<Double> collisions3 = new ArrayList<>();
+        ArrayList<Double> storeTime3 = new ArrayList<>();
+
+        double[] loadFactor = {0.1, 0.5, 0.8, 0.9, 1.0};
+
+        for (double d: loadFactor) {
+
+            HashTable hashTable = new HashTable((int) (store.size() / d));
+
+            long start = System.currentTimeMillis();
+            for (String[] s: store) {
+                int key = Integer.parseInt(s[0]);
+                String value = s[1] + s[2];
+
+                hashTable.put(key, value);
+            }
+            long end = System.currentTimeMillis();
+            collisions1.add((double) ((hashTable.getProbes())/ store.size()));
+            hashTable.setProbes(0);
+            storeTime1.add((double) ((end - start) / store.size()));
+            System.out.println("Finished storing");
+
+            start = System.currentTimeMillis();
+            for (Integer i: success) {
+                hashTable.get(i);
+            }
+            end = System.currentTimeMillis();
+            System.out.println("Finished getting success");
+
+            collisions2.add((double) ((hashTable.getProbes())/ success.size()));
+            hashTable.setProbes(0);
+            storeTime2.add((double) ((end - start) / success.size()));
+
+            start = System.currentTimeMillis();
+            for (Integer i: unsuccess) {
+                hashTable.get(i);
+            }
+            end = System.currentTimeMillis();
+            System.out.println("Finished getting unsuccess");
+
+            collisions3.add((double) ((hashTable.getProbes())/ success.size()));
+            hashTable.setProbes(0);
+            storeTime3.add((double) ((end - start) / success.size()));
+
+            System.out.println("Finished load: " + d);
         }
 
         File fileName = new File("results.csv");
@@ -41,85 +93,18 @@ public class linearProbingDriver {
 
         fileName.createNewFile();
 
-        ArrayList<Double> loadFactors = new ArrayList<>();
-        ArrayList<Double> collisions1 = new ArrayList<>();
-        ArrayList<Double> storeTime1 = new ArrayList<>();
 
-        ArrayList<Double> collisions2 = new ArrayList<>();
-        ArrayList<Double> storeTime2 = new ArrayList<>();
-
-        ArrayList<Double> collisions3 = new ArrayList<>();
-        ArrayList<Double> storeTime3 = new ArrayList<>();
-
-        for (double i = 0.1; i < 1; i += 0.1) {
-
-            loadFactors.add(i);
-            System.out.println("Array size = " + (int) Math.round(500000/i));
-            HashTable hashTable = new HashTable((int) Math.round(500000/i));
-
-            long start = System.currentTimeMillis();
-            for (String[] s: store) {
-                hashTable.put(Integer.parseInt(s[0]), s[1] + " " + s[2]);
-            }
-            long end = System.currentTimeMillis();
-
-            storeTime1.add( ((double)(end - start)/500000));
-            collisions1.add((double) hashTable.getProbes()/500000);
-            System.out.println("Collision: " + (double) hashTable.getProbes()/500000);
-            hashTable.setProbes(0);
-            System.out.println("Average time: " + ((double)(end - start)/500000));
-            System.out.println();
-            System.out.println();
-
-            start = System.currentTimeMillis();
-            for (String[] s: success) {
-                hashTable.get(Integer.parseInt(s[0]));
-            }
-            end = System.currentTimeMillis();
-
-            collisions2.add(((double)hashTable.getProbes() )/ 10000);
-            storeTime2.add(((double) (end-start)/10000));
-            System.out.println("Collision: " + (double) hashTable.getProbes() / 10000);
-            hashTable.setProbes(0);
-            System.out.println("Average time: " + ((double) ((end - start) / 10000)));
-            System.out.println();
-            System.out.println();
-
-            start = System.currentTimeMillis();
-            for (String[] s: unsuccess) {
-                hashTable.get(Integer.parseInt(s[0]));
-            }
-            end = System.currentTimeMillis();
-
-            collisions3.add(((double)hashTable.getProbes() )/ 10000);
-            storeTime3.add((double)(end-start)/10000);
-            System.out.println("Collision: " + (double) hashTable.getProbes() / 10000);
-            hashTable.setProbes(0);
-            System.out.println("Average time: " + ((double) (end - start)/ 10000));
-            System.out.println();
-            System.out.println();
-
-        }
-
-        try{
+        try {
 
             FileWriter output = new FileWriter(fileName);
 
-            CSVWriter writer = new CSVWriter(output);
+            //adding a header
+            output.write("Type of Hashing , Linear Probing \n");
+            output.flush();
 
             //adding a header
-            String[] typeOfProbing = new String[] {"Type of Hashing Linear" , "Probing" };
-            writer.writeNext(typeOfProbing);
-
-            //adding a header
-            String[] hashFunction = new String[] {"Hash function used" , "Integer" };
-            writer.writeNext(hashFunction);
-
-            //Adding elements
-            ArrayList<String[]> probing = new ArrayList<>();
-            probing.add(new String[] {"Load Factor" , "Average Time"});
-            writer.writeNext(probing.get(0));
-
+            output.write("Hash Function used , Integer \n");
+            output.flush();
 
         }catch (Exception e){
             e.printStackTrace();

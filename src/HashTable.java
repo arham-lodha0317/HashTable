@@ -29,16 +29,51 @@ class HashTable {
         probes++;
 
         if(size == capacity){
-            throw new IllegalStateException("HashTable is small");
+            throw new IllegalStateException("HashTable is full");
         }
 
         int hc = key.hashCode();
         int index = hc % capacity;
+        Entry temp = hashTable[index] == null
 
-        if(hashTable[index] == null){
+        if(temp == null){
             hashTable[index] = new Entry(key, value);
             size++;
             return null;
+        }
+        else if(!temp.isRemoved()){
+
+            if(temp.getKey().equals(key)){
+                hashTable[index] = new Entry(key, value);
+                return temp.getValue();
+            }
+            else {
+
+                for (int i = index + 1; i < hashTable.length; i++) {
+
+                    if(hashTable[i] == null){
+                        hashTable[index] = new Entry(key, value);
+                        size++;
+                        return null;
+                    }
+                    else (hashTable[i].isRemoved()){
+                        hashTable[i] = new Entry(key, value);
+
+                        int j = i++;
+
+                        while(hashTable[i] != null && !hashTable[i].getKey().equals(key)){
+
+                        }
+                    }
+
+                    if(i == hashTable.length - 1){
+                        i =0;
+                    }
+
+                }
+
+            }
+
         }
 
         while (true){
@@ -70,6 +105,7 @@ class HashTable {
         int hc = key.hashCode();
         int index = hc % capacity;
         probes++;
+        int loops = 0;
 
         if(hashTable[index] == null){
             return null;
@@ -77,14 +113,14 @@ class HashTable {
         else if(hashTable[index].getKey().equals(key) && !hashTable[index].isRemoved()){
             return hashTable[index].getValue();
         }
-
-        while (hashTable[index] != null && !hashTable[index].getKey().equals(key)){
+        while (hashTable[index] != null && !hashTable[index].getKey().equals(key) && loops < 2){
             probes++;
 
             index++;
 
             if(index == capacity){
                 index = 0;
+                loops++;
             }
         }
         if(hashTable[index] != null && hashTable[index].getKey().equals(key)){
