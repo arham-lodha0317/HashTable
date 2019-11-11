@@ -7,24 +7,35 @@ public class DebuggingCalls
     public static void main(String[] args)
     {
         HashTable table = new HashTable(17);
-        
+
         // insertions - no collisions
         table.put(92800393, "LINNIE GILMAN");
+        table.setProbes(0);
+
         table.put(86770985, "DUSTY CONFER");
-        
+        table.setProbes(0);
+
         // collisions - 1 probe
         table.put(48235250, "KENNITH GRASSMYER");
+        table.setProbes(0);
+
         table.put(31850991, "WANETA DEWEES");
-        
+        table.setProbes(0);
+
+
+        System.out.println(table.get(48235250));
+        System.out.println(table.getProbes());
+        table.setProbes(0);
+
         // insertions - no collisions
         table.put(25428367, "DUSTY BANNON");
         table.put(24248685, "FRANCE COELLO");
         table.put(23331143, "JUSTIN ADKIN");
-        
+
         // collisions - multiple probes
         table.put(68682774, "MALIK TULLER");
         table.put(59245514, "LESLEE PHIFER");
-        
+
         // 2nd put for this key - replace FRANCE COELLO
         // simple overwrite, no collisions
         table.put(24248685, "ISAAC GENEY");
@@ -36,7 +47,7 @@ public class DebuggingCalls
         table.put(54657809, "MARTY ENOCHS");
         // remove JUSTIN ADKIN, simple, no collisions
         table.remove(23331143);
-        
+
         // 2nd put for this key - replace LESLEE PHIFER
         // collisions, overwrite invalid entry, &
         // invalidate original entry
