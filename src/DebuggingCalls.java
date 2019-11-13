@@ -22,11 +22,6 @@ public class DebuggingCalls
         table.put(31850991, "WANETA DEWEES");
         table.setProbes(0);
 
-
-        System.out.println(table.get(48235250));
-        System.out.println(table.getProbes());
-        table.setProbes(0);
-
         // insertions - no collisions
         table.put(25428367, "DUSTY BANNON");
         table.put(24248685, "FRANCE COELLO");

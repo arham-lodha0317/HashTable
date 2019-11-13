@@ -25,26 +25,25 @@ class HashTable {
     }
 
     Object put(Object key, Object value){
-
-        probes++;
-
         if(size == capacity){
             throw new IllegalStateException("HashTable is full");
         }
 
         int hc = key.hashCode();
         int index = hc % capacity;
-        Entry temp = hashTable[index] == null
+        Entry temp = hashTable[index];
 
         if(temp == null){
             hashTable[index] = new Entry(key, value);
             size++;
+            probes++;
             return null;
         }
         else if(!temp.isRemoved()){
 
             if(temp.getKey().equals(key)){
                 hashTable[index] = new Entry(key, value);
+                probes++;
                 return temp.getValue();
             }
             else {
@@ -52,23 +51,40 @@ class HashTable {
                 for (int i = index + 1; i < hashTable.length; i++) {
 
                     if(hashTable[i] == null){
-                        hashTable[index] = new Entry(key, value);
+                        hashTable[i] = new Entry(key, value);
                         size++;
+                        probes++;
                         return null;
                     }
-                    else (hashTable[i].isRemoved()){
+                    else if (hashTable[i].isRemoved()){
                         hashTable[i] = new Entry(key, value);
-
+                        probes++;
                         int j = i++;
 
-                        while(hashTable[i] != null && !hashTable[i].getKey().equals(key)){
-
+                        while(hashTable[j] != null && !hashTable[j].getKey().equals(key)){
+                            j++;
+                            if(j == hashTable.length){
+                                j = 0;
+                            }
+                            probes++;
                         }
+
+                        if(hashTable[i] == null){
+                            size--;
+                            return null;
+                        }
+                        else if(hashTable[i].getKey().equals(key)) {
+                            hashTable[i].setRemoved(true);
+                            return hashTable[i].getValue();
+                        }
+
                     }
 
-                    if(i == hashTable.length - 1){
+                    if(i == hashTable.length){
                         i =0;
                     }
+
+                    probes++;
 
                 }
 
@@ -76,29 +92,7 @@ class HashTable {
 
         }
 
-        while (true){
-            probes++;
-
-            if(hashTable[index] == null){
-                hashTable[index] = new Entry(key, value);
-                size++;
-                return null;
-            }
-            else if(hashTable[index].isRemoved()){
-                hashTable[index] = new Entry(key, value);
-                return null;
-            }
-            else if(hashTable[index].getKey().equals(key)){
-                Entry temp = hashTable[index];
-                hashTable[index] = new Entry(key, value);
-                return temp;
-            }
-            index++;
-            if(index >= capacity){
-                index = 0;
-            }
-        }
-
+        return false;
     }
 
     Object get(Object key){

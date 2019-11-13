@@ -40,7 +40,7 @@ public class linearProbingDriver {
         ArrayList<Double> collisions3 = new ArrayList<>();
         ArrayList<Double> storeTime3 = new ArrayList<>();
 
-        double[] loadFactor = {0.1, 0.5, 0.8, 0.9, 1.0};
+        double[] loadFactor = {0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0};
 
         for (double d: loadFactor) {
 
@@ -54,9 +54,9 @@ public class linearProbingDriver {
                 hashTable.put(key, value);
             }
             long end = System.currentTimeMillis();
-            collisions1.add((double) ((hashTable.getProbes())/ store.size()));
+            collisions1.add(((double) (hashTable.getProbes())/ store.size()));
             hashTable.setProbes(0);
-            storeTime1.add((double) ((end - start) / store.size()));
+            storeTime1.add(((double) (end - start) / store.size()));
             System.out.println("Finished storing");
 
             start = System.currentTimeMillis();
@@ -66,9 +66,9 @@ public class linearProbingDriver {
             end = System.currentTimeMillis();
             System.out.println("Finished getting success");
 
-            collisions2.add((double) ((hashTable.getProbes())/ success.size()));
+            collisions2.add( (( (double) hashTable.getProbes())/ success.size()));
             hashTable.setProbes(0);
-            storeTime2.add((double) ((end - start) / success.size()));
+            storeTime2.add(( (double)(end - start) / success.size()));
 
             start = System.currentTimeMillis();
             for (Integer i: unsuccess) {
@@ -77,9 +77,9 @@ public class linearProbingDriver {
             end = System.currentTimeMillis();
             System.out.println("Finished getting unsuccess");
 
-            collisions3.add((double) ((hashTable.getProbes())/ success.size()));
+            collisions3.add((double) ((double) (hashTable.getProbes())/ success.size()));
             hashTable.setProbes(0);
-            storeTime3.add((double) ((end - start) / success.size()));
+            storeTime3.add((double) ( (double)(end - start) / success.size()));
 
             System.out.println("Finished load: " + d);
         }
@@ -105,6 +105,63 @@ public class linearProbingDriver {
             //adding a header
             output.write("Hash Function used , Integer \n");
             output.flush();
+
+            output.write("Building the Hash Table \n");
+            output.flush();
+
+            output.write("Load Factors a , Average Put Time \n");
+            output.flush();
+
+            for (int i = 0; i < loadFactor.length; i++) {
+                output.write(loadFactor[i] + " , " + storeTime1.get(i) + "\n");
+                output.flush();
+            }
+
+            output.write("Load Factors a , Number of average probes \n");
+            output.flush();
+
+            for (int i = 0; i < loadFactor.length; i++) {
+                output.write(loadFactor[i] + " , " + collisions1.get(i) + "\n");
+                output.flush();
+            }
+
+            output.write("Getting successful from the Hash Table \n");
+            output.flush();
+
+            output.write("Load Factors a , Average Get Time \n");
+            output.flush();
+
+            for (int i = 0; i < loadFactor.length; i++) {
+                output.write(loadFactor[i] + " , " + storeTime2.get(i) + "\n");
+                output.flush();
+            }
+
+            output.write("Load Factors a , Number of average probes + \n");
+            output.flush();
+
+            for (int i = 0; i < loadFactor.length; i++) {
+                output.write(loadFactor[i] + " , " + collisions2.get(i) + "\n");
+                output.flush();
+            }
+
+            output.write("Getting unsuccessful from the Hash Table \n");
+            output.flush();
+
+            output.write("Load Factors a , Average Get Time \n");
+            output.flush();
+
+            for (int i = 0; i < loadFactor.length; i++) {
+                output.write(loadFactor[i] + " , " + storeTime3.get(i) + "\n");
+                output.flush();
+            }
+
+            output.write("Load Factors a , Number of average probes \n");
+            output.flush();
+
+            for (int i = 0; i < loadFactor.length; i++) {
+                output.write(loadFactor[i] + " , " + collisions3.get(i) + "\n");
+                output.flush();
+            }
 
         }catch (Exception e){
             e.printStackTrace();
